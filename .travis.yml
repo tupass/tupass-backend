@@ -1,0 +1,57 @@
+language: go
+go: master
+
+stages:
+- name: test
+- name: build
+  if: tag IS present
+
+script: skip
+addons:
+      ssh_known_hosts: tupass.pw
+
+jobs:
+  include:
+  - stage: test
+    name: Lint and tests
+    script:
+      - make lint
+      - make gosec
+      - make test-api
+  - stage: build
+    name: Build and release binaries
+    before_script:
+      - curl -sL https://deb.nodesource.com/setup_10.x | sudo bash -
+      - sudo apt-get install -y nodejs libpam0g-dev
+    script:
+      - make build
+      - make build-pam
+      - make build-local
+      - make build-deb
+    #For deploying to tupass.pw
+    #after_success:
+    #  - openssl aes-256-cbc -K $encrypted_5a3f9a5cab32_key -iv $encrypted_5a3f9a5cab32_iv
+    #    -in deploy_key.enc -out ./deploy_key -d
+    #  - eval "$(ssh-agent -s)"
+    #  - chmod 600 ./deploy_key
+    #  - ssh-add ./deploy_key
+    #  - ssh tupass@tupass.pw sudo systemctl stop tupass-backend
+    #  - "scp tupass-backend tupass@tupass.pw:"
+    #  - ssh tupass@tupass.pw sudo systemctl start tupass-backend
+    deploy:
+      provider: releases
+      skip_cleanup: true
+      on:
+        tags: true
+      api_key:
+        secure: qs42ig4R3wHEtzwba5osGnGM30fKBb9wk7jQFzH2YLUCofe6T6rAbFCu2JLkHIDyNL31S1Y2V3c96rAGRL5aLWd14+WOnv+exeUxhqHIgZ9VJ7sK0ht6hJ0N53mZZKZWOiM5KzSwJfCDuhaQ+9LPcrMkkTIb4+LK0vCEXEz9HGw6xN239cBp1M9+E6YxwXOlX744OEAlakfD5BqlqCe3zno3TxTVPXFgounjZplaxWFuHRVdooVaKKwmxaLXNVk2lMJLSfnzwBt3TOkUFpVpw3a96S+qzYOT/Uz5ktp85ND5kK7I3C9WAmL2cuzdVi4L4Wpb6NUXrJ/bmgfMh5+AUks197wbbL5KL6jgy/AXhiSoRrd7swwAjvb9hkCIwpFWPQBEXOGMlMTVQ4YdwCPu9iiu+XxTOxa9TolsS80yEWl0KQckQEIXJq14SjxRcwIyixZZ5E7bzQGZ0hW9IpfkRzBGFaPQzaIsk7wIg+5zJckaltZpkEY/ILyxh3XMilVEm7NvP9LykQoJzpchZFLsbLeHh46Q+X760KiBPgaEuoKaQydiT4r52W/0DSDBL2A5PBB1idzTYNGUmMKIR1dHT0aEcvIO6MAKKRfyl8jgm2uV60gN6vcyR/Tpq6AKhq1R2nz4cRaSwY7M2vBYvIL9eiiL0Wm6yL7fD7olYj7xDIo=
+      file_glob: true
+      file:
+        - pam/libtupass.so
+        - pam/libtupass.h
+        - pam/pam_tupass.so
+        - tupass-backend
+        - tupass
+        - tupass-darwin
+        - tupass-*.deb
+        - tupass.exe

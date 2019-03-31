@@ -1,0 +1,6 @@
+Name: Check password using TUPass
+Default: no
+Priority: 0
+Password-Type: Additional
+Password-Final:
+        required        pam_tupass.so debug

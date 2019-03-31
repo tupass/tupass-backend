@@ -1,0 +1,115 @@
+openapi: "3.0.2"
+
+info:
+  title: "TUPass API"
+  version: "0.1.0"
+
+servers:
+- url: "https://tupass.pw/api"
+
+tags:
+  - name: password-strength
+    description: "Evaluate the strength of a password"
+
+paths:
+  /:
+    get:
+      tags:
+        - password-strength
+      summary: "Evaluate the strenth of a password"
+      parameters:
+        - name: password
+          in: header
+          required: true
+          description: "Quote-escaped Password to evaluate"
+          schema:
+            type: "string"
+            example: '"S0meFancy\"Passw0rd"'
+        - name: language
+          in: header
+          required: true
+          description: "Language for hint-creation"
+          schema:
+            type: "string"
+        - name: language
+          in: header
+          required: true
+          description: "Language for hint-creation"
+          schema:
+            type: "string"
+      responses:
+        200:
+          description: "Password strength score"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Strength"
+        400:
+          description: "The given password is not acceptable (because it contains non-ASCII characters)"
+
+
+components:
+  schemas:
+    Percentage:
+      type: number
+      minimum: 0
+      maximum: 100
+      description: "A percentage score of how good the password is regarding the respective metric"
+    Grade:
+      type: string
+      description: "A textual description for the grade the password scored in the respective metric"
+    Hints:
+      type: array
+      items:
+        type: string
+      description: "Textual hints that are meant for improving the passwords score for the respective metric"
+    Strength:
+      type: object
+      required:
+        - length
+        - complexity
+        - predictability
+        - total
+      properties:
+        length:
+          type: object
+          required: [score, grade, hints]
+          description: "The password's score regarding its length"
+          properties:
+            score:
+              $ref: "#/components/schemas/Percentage"
+            grade:
+              $ref: "#/components/schemas/Grade"
+            hints:
+              $ref: "#/components/schemas/Hints"
+        complexity:
+          type: object
+          required: [score, grade, hints]
+          description: "The password's score regarding its complexity"
+          properties:
+            score:
+              $ref: "#/components/schemas/Percentage"
+            grade:
+              $ref: "#/components/schemas/Grade"
+            hints:
+              $ref: "#/components/schemas/Hints"
+        predictability:
+          type: object
+          required: [score, grade, hints]
+          description: "The password's score regarding its predictability"
+          properties:
+            score:
+              $ref: "#/components/schemas/Percentage"
+            grade:
+              $ref: "#/components/schemas/Grade"
+            hints:
+              $ref: "#/components/schemas/Hints"
+        total:
+          type: object
+          required: [score, grade]
+          description: "The password's combined score from the previous metrics"
+          properties:
+            score:
+              $ref: "#/components/schemas/Percentage"
+            grade:
+              $ref: "#/components/schemas/Grade"

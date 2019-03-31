@@ -1,0 +1,10 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=TUPass
+Comment=TUPass Password Strength Meter
+Exec=xdg-open http://localhost:8000
+Icon=/usr/share/tupass/icon.png
+Terminal=false
+Type=Application
+Categories=GNOME;Application;Network
+StartupNotify=true

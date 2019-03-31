@@ -1,0 +1,4 @@
+libtupass-test
+libtupass.so
+libtupass.h
+pam_tupass.o

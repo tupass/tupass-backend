@@ -1,0 +1,10 @@
+Package: tupass
+Version: XYZ
+Section: web
+Priority: optional
+Architecture: all
+Maintainer: Simon Althaus <simon@alt.haus>
+Build-Depends: libc6
+Homepage: https://tupass.pw
+Description: Password strength meter
+  for evaluating the strength of passwords
